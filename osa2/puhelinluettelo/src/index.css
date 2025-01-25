@@ -1,16 +1,16 @@
-h1 {
-    color: pink;
+h2 {
+    color: black;
     font-style: italic;
 }
 
 li {
-    color: grey;
-    padding-top: 3px;
+    color: black;
+    padding-top: 4px;
     font-size: 15px;
 }
 
-.error {
-    color: red;
+.notification {
+    color: green;
     background: lightgrey;
     font-size: 20px;
     border-style: solid;

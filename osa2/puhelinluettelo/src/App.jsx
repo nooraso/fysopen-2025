@@ -3,14 +3,14 @@ import { PersonForm } from './components/PersonForm.jsx'
 import { PersonList } from './components/PersonList.jsx'
 import Filter from './components/Filter.jsx'
 import personService from './services/Persons.js'
-
+import Notification from './components/Notification.jsx'
 
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filterText, setFilterText] = useState('')
-  const [errorMessage, setErrorMessage] = useState('some error happened...')
+  const [notification, setNotification] = useState('')
 
   useEffect(() => {
     personService
@@ -52,10 +52,11 @@ const App = () => {
         setPersons(persons.concat(savedPerson))
         setNewName('')
         setNewNumber('')
+        showNotification(`Added ${newPerson.name}`)
       })
       .catch(error => {
         console.log('Failed to save person:', error)
-        alert(`Failed to save person ${newPerson.name} to server.`)
+        showNotification(`Failed to save person ${newPerson.name} to server.`)
       })
   }
 
@@ -66,10 +67,11 @@ const App = () => {
         .remove(id)
         .then(() => {
           setPersons(persons.filter(person => person.id !== id))
+          showNotification(`Deleted ${person.name}`, 'success')
         })
         .catch(error => {
           console.log('Failed to delete person:', error)
-          alert(`Failed to delete person ${person.name} from server.`)
+          showNotification(`Failed to delete person ${person.name} from server.`)
         })
     }
   }
@@ -81,24 +83,33 @@ const App = () => {
         setPersons(persons.map(person => person.id !== id ? person : updatedPerson))
         setNewName('')
         setNewNumber('')
+        showNotification(`Updated ${newPerson.name}`, 'success')
       })
       .catch(error => {
         console.log('Failed to update person:', error)
-        alert(`Failed to update person ${newPerson.name} to server.`)
+        showNotification(`Failed to update person ${newPerson.name} to server.`)
       })
   }
 
   const personsToShow = filterText
-  ? persons.filter(person => 
-      person.name.toLowerCase().includes(filterText.toLowerCase())
-    )
-  : persons
+    ? persons.filter(person => 
+        person.name.toLowerCase().includes(filterText.toLowerCase())
+      )
+    : persons
+
+  const showNotification = (message, type = 'success') => {
+    setNotification({ message, type })
+    setTimeout(() => {
+      setNotification(null)
+   }, type === 'success' ? 2000 : 5000)
+  }
 
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification notification={notification} />
       <Filter filter={filterText} handleFilterChange={handleFilterChange} />
-      <h2>add new person</h2>
+      <h2>Add new person</h2>
       <PersonForm 
         newName={newName} 
         handleNameChange={handleNameChange} 
@@ -107,16 +118,10 @@ const App = () => {
         addPerson={addPerson}
         handleUpdate={updatePerson} 
       />
-      <div>debuggggi: {newName} {newNumber}</div>
       <h2>Numbers</h2>
       <PersonList persons={personsToShow} deletePerson={deletePerson} />
     </div>
   )
-
 }
-
-
-
-
 
 export default App
